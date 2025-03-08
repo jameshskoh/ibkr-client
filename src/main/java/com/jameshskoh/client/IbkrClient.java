@@ -26,9 +26,8 @@ public class IbkrClient {
   private final Queue<DataJob> jobQueue;
   private final ConcurrentHashMap<Integer, DataJob> processingJobRecords =
       new ConcurrentHashMap<>();
-  /*
-   * only works when there's only 1 client connecting to IB, else you have to retrieve orderId from IB every time you send a request
-   */
+
+  // only works when there's only 1 client connecting to IB
   private final AtomicInteger orderId = new AtomicInteger(0);
 
   // database connection related
@@ -46,8 +45,6 @@ public class IbkrClient {
       throws SQLException {
 
     this.jobQueue = jobQueue;
-
-    // connection pool if needed?
     this.connection = DriverManager.getConnection(databaseUrl, databaseUser, databasePassword);
 
     IntFunction<DataJob> getJobInfoCallback = processingJobRecords::get;

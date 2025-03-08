@@ -35,7 +35,6 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
     this.removeJobCallback = removeJobCallback;
   }
 
-  // concerns about connection creation + query overhead
   @Override
   public void handleHistoricalData(int reqId, Bar bar) {
     DataJob job = getJobInfoCallback.apply(reqId);
@@ -48,7 +47,6 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
 
   private void handleStockHistoricalData(StockTicker ticker, Bar bar) {
 
-    // consider upsert instead of insert
     String insertSQL =
         """
     INSERT INTO daily_stock_price
@@ -59,7 +57,6 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
     try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
       System.out.println("Statement created!");
 
-      // TODO check if date format is correct
       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
       LocalDate localDate = LocalDate.parse(bar.time(), dtf);
 
@@ -84,7 +81,6 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
 
   private void handleExchangeRateHistoricalData(ExchangeRateTicker ticker, Bar bar) {
 
-    // consider upsert instead of insert
     String insertSQL =
         """
     INSERT INTO daily_exchange_rate

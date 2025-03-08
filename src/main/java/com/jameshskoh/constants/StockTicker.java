@@ -14,6 +14,5 @@ public record StockTicker(
   public static StockTicker SPLG = new StockTicker("SPLG", SecurityType.STOCK_ETF, Exchange.NASDAQ, Currency.USD);
   public static StockTicker STQ = new StockTicker("STQ", SecurityType.STOCK_ETF, Exchange.SMART_EU, Currency.EUR);
 
-  // create an index ticker record
   public static StockTicker SP500 = new StockTicker("SPX", SecurityType.INDEX, Exchange.CBOE, Currency.USD);
 }

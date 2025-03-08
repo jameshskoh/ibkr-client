@@ -15,16 +15,9 @@ import java.util.Queue;
 public class Main {
 
   public static void main(String[] args) throws InterruptedException, IOException, SQLException {
-
     IbkrClient ibkrClient = prepareIbkrClient();
-
     ibkrClient.connectAndListen("localhost", 7499, 0);
-
-    // ignore failed queue object for now (further impl. e.g. retry/timeout)
-    // add dead letter queue for failed jobs
-    // cater end program criteria for dead letter queue
     ibkrClient.waitForConnectionAndMakeRequests();
-
     ibkrClient.waitForCompletionAndDisconnect();
   }
 

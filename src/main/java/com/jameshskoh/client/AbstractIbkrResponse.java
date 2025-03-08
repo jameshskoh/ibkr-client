@@ -8,7 +8,7 @@ import java.util.Set;
 
 public abstract class AbstractIbkrResponse implements EWrapper {
 
-  // Not implemented yet
+  // Not supported yet
 
   @Override
   public void tickPrice(int i, int i1, double v, TickAttrib tickAttrib) {

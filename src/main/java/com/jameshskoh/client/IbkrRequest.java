@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter;
 // https://www.interactivebrokers.com/campus/ibkr-quant-news/retrieving-historical-data-from-ibkr/
 public class IbkrRequest {
 
-  // turn this into another enum if needed
   private static final String MIDPOINT = "MIDPOINT";
   private static final String TRADES = "TRADES";
 

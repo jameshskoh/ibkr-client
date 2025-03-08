@@ -8,7 +8,6 @@ import java.io.IOException;
 
 public class SecretClient {
 
-  // parameterize projectId from another source
   private static final String projectId = "stocks-450610";
 
   public String getSecret(SecretType secretType) throws IOException {
