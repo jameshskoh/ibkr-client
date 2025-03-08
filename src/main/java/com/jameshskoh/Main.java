@@ -15,10 +15,24 @@ import java.util.Queue;
 public class Main {
 
   public static void main(String[] args) throws InterruptedException, IOException, SQLException {
-    IbkrClient ibkrClient = prepareIbkrClient();
+
+    String projectId = parseProjectIdArgument(args);
+
+    IbkrClient ibkrClient = prepareIbkrClient(projectId);
     ibkrClient.connectAndListen("localhost", 7499, 0);
     ibkrClient.waitForConnectionAndMakeRequests();
     ibkrClient.waitForCompletionAndDisconnect();
+  }
+
+  private static String parseProjectIdArgument(String[] args) {
+    for (String arg : args) {
+      if (arg.startsWith("--projectId=")) {
+        int valueStartIndex = arg.indexOf("=") + 1;
+        return arg.substring(valueStartIndex);
+      }
+    }
+
+    throw new IllegalArgumentException("projectId argument is missing.");
   }
 
   private static Queue<DataJob> prepareJobQueue() {
@@ -38,13 +52,15 @@ public class Main {
     return waitingJobQueue;
   }
 
-  private static IbkrClient prepareIbkrClient() throws IOException, SQLException {
+  private static IbkrClient prepareIbkrClient(String projectId) throws IOException, SQLException {
+
     SecretClient secretClient = new SecretClient();
-    String stocksDatabaseUrl = secretClient.getSecret(SecretClient.SecretType.STOCKS_DATABASE_URL);
+    String stocksDatabaseUrl =
+        secretClient.getSecret(projectId, SecretClient.SecretType.STOCKS_DATABASE_URL);
     String stocksDatabaseUser =
-        secretClient.getSecret(SecretClient.SecretType.STOCKS_DATABASE_USER);
+        secretClient.getSecret(projectId, SecretClient.SecretType.STOCKS_DATABASE_USER);
     String stocksDatabasePasswrd =
-        secretClient.getSecret(SecretClient.SecretType.STOCKS_DATABASE_PASSWORD);
+        secretClient.getSecret(projectId, SecretClient.SecretType.STOCKS_DATABASE_PASSWORD);
 
     Queue<DataJob> jobQueue = prepareJobQueue();
 

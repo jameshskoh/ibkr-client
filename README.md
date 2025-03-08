@@ -2,13 +2,14 @@
 
 ### To-dos
 
-* [ ] Parameterize private repo in pom.xml
-* [ ] Parameterize projectId in SecretClient
+* [x] Parameterize private repo in pom.xml
+* [x] Parameterize projectId in SecretClient as program argument
 * [ ] Change setIsConnected into a callback
 * [ ] Create IndexTicker type, to support Index data type
 * [ ] Implement insert batching handler impl.
 * [ ] Use upserts in place of inserts
 * [ ] Turn MIDPOINT/TRADES into enum
+* [ ] Add documentations about `environment.properties` and  `--projectId=` program argument
 * [ ] Implement dead letter queue for failed job reporting
   * [ ] Cater end program criteria to failed jobs
 * [ ] Implement job timeout failure (for better automation stability)

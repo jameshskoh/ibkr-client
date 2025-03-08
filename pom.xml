@@ -29,18 +29,18 @@
     <distributionManagement>
         <snapshotRepository>
             <id>artifact-registry</id>
-            <url>artifactregistry://asia-maven.pkg.dev/stocks-450610/my-repo</url>
+            <url>${repository.url}</url>
         </snapshotRepository>
         <repository>
             <id>artifact-registry</id>
-            <url>artifactregistry://asia-maven.pkg.dev/stocks-450610/my-repo</url>
+            <url>${repository.url}</url>
         </repository>
     </distributionManagement>
 
     <repositories>
         <repository>
             <id>artifact-registry</id>
-            <url>artifactregistry://asia-maven.pkg.dev/stocks-450610/my-repo</url>
+            <url>${repository.url}</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -58,6 +58,26 @@
                 <version>2.2.0</version>
             </extension>
         </extensions>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>environment.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>

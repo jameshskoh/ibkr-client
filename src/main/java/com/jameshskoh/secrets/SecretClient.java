@@ -8,9 +8,7 @@ import java.io.IOException;
 
 public class SecretClient {
 
-  private static final String projectId = "stocks-450610";
-
-  public String getSecret(SecretType secretType) throws IOException {
+  public String getSecret(String projectId, SecretType secretType) throws IOException {
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
       SecretVersionName secretVersionName =
           SecretVersionName.of(projectId, secretType.getLabel(), "latest");
