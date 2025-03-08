@@ -8,9 +8,9 @@
 * [x] Create IndexTicker type, to support Index data type
 * [x] Replace all `System.out.println()` with loggers
 * [x] Use upserts in place of inserts
+* [x] Turn MIDPOINT/TRADES into enum
 * [ ] Implement insert batching handler impl.
 * [ ] Add Flyway support
-* [ ] Turn MIDPOINT/TRADES into enum
 * [ ] Add documentations about `environment.properties` and  `--projectId=` program argument
 * [ ] Implement dead letter queue for failed job reporting
   * [ ] Cater end program criteria to failed jobs
