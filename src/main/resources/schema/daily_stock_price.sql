@@ -9,6 +9,7 @@ CREATE TABLE daily_stock_price (
     close DECIMAL(15, 5) NOT NULL,
     wap DECIMAL(15, 5) NOT NULL,
     volume DECIMAL(20, 5) NOT NULL,
+    source VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (symbol, exchange, currency, date)

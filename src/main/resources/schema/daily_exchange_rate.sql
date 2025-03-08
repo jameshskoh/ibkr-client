@@ -9,6 +9,7 @@ CREATE TABLE daily_exchange_rate (
     -- IBKR exchange rate data does not contain the following fields
     wap DECIMAL(15, 5),
     volume DECIMAL(20, 5),
+    source VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (base_currency, target_currency, date)

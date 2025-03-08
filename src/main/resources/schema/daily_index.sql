@@ -7,6 +7,7 @@ CREATE TABLE daily_index (
     high DECIMAL(15, 5) NOT NULL,
     low DECIMAL(15, 5) NOT NULL,
     close DECIMAL(15, 5) NOT NULL,
+    source VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (symbol, exchange, currency, date)
