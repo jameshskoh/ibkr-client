@@ -1,11 +1,10 @@
 package com.jameshskoh.enums;
 
 public enum Currency {
-  CNY("CNY"),
+  CNH("CNH"),
   EUR("EUR"),
   HKD("HKD"),
   JPY("JPY"),
-  MYR("MYR"),
   SGD("SGD"),
   USD("USD");
 

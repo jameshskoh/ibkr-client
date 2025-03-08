@@ -1,55 +1,123 @@
 package com.jameshskoh.handlers;
 
 import com.ib.client.Bar;
+import com.jameshskoh.client.DataJob;
+import com.jameshskoh.constants.ExchangeRateTicker;
+import com.jameshskoh.constants.StockTicker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
 
 public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
 
-  private static final String URL =
-      "jdbc:postgresql://ep-broad-glitter-a11oiif3-pooler.ap-southeast-1.aws.neon.tech/neondb";
-  private static final String USERNAME = "neondb_owner";
-  private static final String PASSWORD = "npg_Jm38gwsiactj";
+  private static final Logger logger = LoggerFactory.getLogger(DatabaseHistoricalDataHandler.class);
+
+  private final Connection connection;
+
+  private final IntFunction<DataJob> getJobInfoCallback;
+  private final IntConsumer removeJobCallback;
+
+  public DatabaseHistoricalDataHandler(
+      Connection connection,
+      IntFunction<DataJob> getJobInfoCallback,
+      IntConsumer removeJobCallback) {
+
+    this.connection = connection;
+    this.getJobInfoCallback = getJobInfoCallback;
+    this.removeJobCallback = removeJobCallback;
+  }
 
   // concerns about connection creation + query overhead
   @Override
   public void handleHistoricalData(int reqId, Bar bar) {
+    DataJob job = getJobInfoCallback.apply(reqId);
+
+    switch (job.ticker()) {
+      case StockTicker t -> handleStockHistoricalData(t, bar);
+      case ExchangeRateTicker t -> handleExchangeRateHistoricalData(t, bar);
+    }
+  }
+
+  private void handleStockHistoricalData(StockTicker ticker, Bar bar) {
+
+    // consider upsert instead of insert
     String insertSQL =
         """
-INSERT INTO daily_stock_price
-(symbol, security_type, exchange, currency, date, open, high, low, close, wap, volume)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-""";
+    INSERT INTO daily_stock_price
+    (symbol, exchange, currency, date, open, high, low, close, wap, volume)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
-    try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-      System.out.println("Connection created!");
+    try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+      System.out.println("Statement created!");
 
-      try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-        System.out.println("Statement created!");
+      // TODO check if date format is correct
+      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+      LocalDate localDate = LocalDate.parse(bar.time(), dtf);
 
-        preparedStatement.setInt(1, reqId);
-        preparedStatement.setString(2, bar.time());
-        preparedStatement.setBigDecimal(3, BigDecimal.valueOf(bar.open()));
-        preparedStatement.setBigDecimal(4, BigDecimal.valueOf(bar.high()));
-        preparedStatement.setBigDecimal(5, BigDecimal.valueOf(bar.low()));
-        preparedStatement.setBigDecimal(6, BigDecimal.valueOf(bar.close()));
-        preparedStatement.setBigDecimal(7, bar.wap().value());
-        preparedStatement.setBigDecimal(8, bar.volume().value());
+      preparedStatement.setString(1, ticker.symbol());
+      preparedStatement.setString(2, ticker.exchange().getLabel());
+      preparedStatement.setString(3, ticker.currency().getLabel());
+      preparedStatement.setDate(4, java.sql.Date.valueOf(localDate));
 
-        preparedStatement.executeUpdate();
-        System.out.println("Data inserted successfully!");
-      }
+      preparedStatement.setBigDecimal(5, BigDecimal.valueOf(bar.open()));
+      preparedStatement.setBigDecimal(6, BigDecimal.valueOf(bar.high()));
+      preparedStatement.setBigDecimal(7, BigDecimal.valueOf(bar.low()));
+      preparedStatement.setBigDecimal(8, BigDecimal.valueOf(bar.close()));
+      preparedStatement.setBigDecimal(9, bar.wap().value());
+      preparedStatement.setBigDecimal(10, bar.volume().value());
+
+      preparedStatement.executeUpdate();
+      logger.info("Data inserted successfully!");
     } catch (SQLException e) {
-      e.printStackTrace();
+      logger.error("Data insertion failed: {}", e.getMessage());
+    }
+  }
+
+  private void handleExchangeRateHistoricalData(ExchangeRateTicker ticker, Bar bar) {
+
+    // consider upsert instead of insert
+    String insertSQL =
+        """
+    INSERT INTO daily_exchange_rate
+    (base_currency, target_currency, date, open, high, low, close)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    """;
+
+    try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+      System.out.println("Statement created!");
+
+      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+      LocalDate localDate = LocalDate.parse(bar.time(), dtf);
+
+      preparedStatement.setString(1, ticker.baseCurrency().getLabel());
+      preparedStatement.setString(2, ticker.targetCurrency().getLabel());
+      preparedStatement.setDate(3, java.sql.Date.valueOf(localDate));
+
+      preparedStatement.setBigDecimal(4, BigDecimal.valueOf(bar.open()));
+      preparedStatement.setBigDecimal(5, BigDecimal.valueOf(bar.high()));
+      preparedStatement.setBigDecimal(6, BigDecimal.valueOf(bar.low()));
+      preparedStatement.setBigDecimal(7, BigDecimal.valueOf(bar.close()));
+
+      preparedStatement.executeUpdate();
+      logger.info("Data inserted successfully!");
+    } catch (SQLException e) {
+      logger.error("Data insertion failed: {}", e.getMessage());
+
     }
   }
 
   @Override
   public void handleHistoricalDataEnd(int reqId, String start, String end) {
     System.out.println("Historical Data End: " + start + ", " + end);
+    removeJobCallback.accept(reqId);
   }
 }

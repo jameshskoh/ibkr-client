@@ -3,40 +3,59 @@ package com.jameshskoh.client;
 import com.ib.client.*;
 import com.jameshskoh.constants.ExchangeRateTicker;
 import com.jameshskoh.constants.StockTicker;
+import com.jameshskoh.handlers.DatabaseHistoricalDataHandler;
 import com.jameshskoh.handlers.HistoricalDataHandler;
-import com.jameshskoh.handlers.LoggerHistoricalDataHandler;
-
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
 
 public class IbkrClient {
 
+  // connection related
   private final AtomicBoolean isConnected = new AtomicBoolean(false);
-  private final Queue<DataJob> jobQueue;
-  private final ConcurrentHashMap<Integer, DataJob> processingJobRecords;
 
+  // job related
+  private final Queue<DataJob> jobQueue;
+  private final ConcurrentHashMap<Integer, DataJob> processingJobRecords =
+      new ConcurrentHashMap<>();
   /*
    * only works when there's only 1 client connecting to IB, else you have to retrieve orderId from IB every time you send a request
    */
   private final AtomicInteger orderId = new AtomicInteger(0);
 
-  private final HistoricalDataHandler historicalDataHandler;
+  // database connection related
+  private final Connection connection;
 
+  // other dependencies
   private final IbkrRequest ibkrRequest;
   private final IbkrResponse ibkrResponse;
   private final EReaderSignal readerSignal;
   private final EClientSocket clientSocket;
   private final ExecutorService readerExecutorService;
 
-  public IbkrClient(Queue<DataJob> jobQueue) {
-    this.jobQueue = jobQueue;
-    processingJobRecords = new ConcurrentHashMap<>();
+  public IbkrClient(
+      Queue<DataJob> jobQueue, String databaseUrl, String databaseUser, String databasePassword)
+      throws SQLException {
 
-    historicalDataHandler = new LoggerHistoricalDataHandler(this);
+    this.jobQueue = jobQueue;
+
+    // connection pool if needed?
+    this.connection = DriverManager.getConnection(databaseUrl, databaseUser, databasePassword);
+
+    IntFunction<DataJob> getJobInfoCallback = processingJobRecords::get;
+    IntConsumer removeJobCallback = processingJobRecords::remove;
+
+    HistoricalDataHandler historicalDataHandler =
+        new DatabaseHistoricalDataHandler(connection, getJobInfoCallback, removeJobCallback);
+
     ibkrRequest = new IbkrRequest();
     ibkrResponse = new IbkrResponse(this, historicalDataHandler);
     readerSignal = new EJavaSignal();
@@ -83,7 +102,7 @@ public class IbkrClient {
   private void ingestJob(Queue<DataJob> jobQueue) throws InterruptedException {
     while (!jobQueue.isEmpty()) {
       while (isProcessingJob()) {
-        Thread.sleep(100);
+        Thread.sleep(15000);
       }
 
       // critical section?
@@ -112,16 +131,13 @@ public class IbkrClient {
     return !processingJobRecords.isEmpty();
   }
 
-  public void removeJob(int requestId) {
-    processingJobRecords.remove(requestId);
-  }
-
-  public void waitForCompletionAndDisconnect() throws InterruptedException {
+  public void waitForCompletionAndDisconnect() throws InterruptedException, SQLException {
     while (!jobQueue.isEmpty() || isProcessingJob()) {
-      Thread.sleep(100);
+      Thread.sleep(15000);
     }
 
     clientSocket.eDisconnect();
     readerExecutorService.shutdown();
+    connection.close();
   }
 }

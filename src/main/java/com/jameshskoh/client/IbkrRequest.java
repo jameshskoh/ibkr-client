@@ -15,6 +15,8 @@ import java.time.format.DateTimeFormatter;
 // https://www.interactivebrokers.com/campus/ibkr-quant-news/retrieving-historical-data-from-ibkr/
 public class IbkrRequest {
 
+  // turn this into another enum if needed
+  private static final String MIDPOINT = "MIDPOINT";
   private static final String TRADES = "TRADES";
 
   public void requestDailyHistoricalExchangeRate(
@@ -25,13 +27,14 @@ public class IbkrRequest {
       int backPeriodInYears) {
 
     Contract contract = new Contract();
-    contract.symbol(ticker.targetCurrency().getLabel());
+    contract.symbol(ticker.baseCurrency().getLabel());
     contract.secType(SecurityType.FOREX_PAIR.getLabel());
-    contract.currency(ticker.baseCurrency().getLabel());
+    contract.currency(ticker.targetCurrency().getLabel());
     contract.exchange(Exchange.IDEALPRO.getLabel());
 
+    // exchange rate data does not have TRADES data, nor volume, nor volume weighted average
     requestDailyHistoricalData(
-        clientSocket, jobId, contract, endPeriod, TimeZones.UTC, backPeriodInYears);
+        clientSocket, jobId, contract, endPeriod, TimeZones.UTC, backPeriodInYears, MIDPOINT);
   }
 
   public void requestDailyHistoricalStockPrice(
@@ -48,7 +51,13 @@ public class IbkrRequest {
     contract.exchange(ticker.exchange().getLabel());
 
     requestDailyHistoricalData(
-        clientSocket, jobId, contract, endPeriod, ticker.exchange().getZoneId(), backPeriodInYears);
+        clientSocket,
+        jobId,
+        contract,
+        endPeriod,
+        ticker.exchange().getZoneId(),
+        backPeriodInYears,
+        TRADES);
   }
 
   private void requestDailyHistoricalData(
@@ -57,7 +66,8 @@ public class IbkrRequest {
       Contract contract,
       LocalDate cutoffDate,
       ZoneId zoneId,
-      int backPeriodInYears) {
+      int backPeriodInYears,
+      String whatToShow) {
 
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss VV");
     String endDateTimeString =
@@ -88,7 +98,7 @@ public class IbkrRequest {
         endDateTimeString,
         backPeriods,
         Interval.DAY.getLabel(),
-        TRADES,
+        whatToShow,
         1,
         1,
         false,

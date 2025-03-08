@@ -1,6 +1,5 @@
 CREATE TABLE daily_stock_price (
     symbol VARCHAR(32) NOT NULL,
-    security_type VARCHAR(10) NOT NULL,
     exchange VARCHAR(32) NOT NULL,
     currency VARCHAR(3) NOT NULL,
     date DATE NOT NULL,
@@ -12,5 +11,5 @@ CREATE TABLE daily_stock_price (
     volume DECIMAL(20, 5) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (symbol, security_type, exchange, currency, date)
+    PRIMARY KEY (symbol, exchange, currency, date)
 );
