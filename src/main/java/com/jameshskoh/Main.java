@@ -3,6 +3,7 @@ package com.jameshskoh;
 import com.jameshskoh.client.DataJob;
 import com.jameshskoh.client.IbkrClient;
 import com.jameshskoh.constants.ExchangeRateTicker;
+import com.jameshskoh.constants.IndexTicker;
 import com.jameshskoh.constants.StockTicker;
 import com.jameshskoh.secrets.SecretClient;
 
@@ -47,7 +48,7 @@ public class Main {
     waitingJobQueue.offer(new DataJob(ExchangeRateTicker.USDSGD, LocalDate.of(2024, 12, 31), 1));
     //    waitingJobQueue.offer(new DataJob(ExchangeRateTicker.EURSGD, LocalDate.of(2024, 12, 31),
     // 1));
-    //    waitingJobQueue.offer(new DataJob(StockTicker.SP500, LocalDate.of(2024, 12, 31), 1));
+    waitingJobQueue.offer(new DataJob(IndexTicker.SP500, LocalDate.of(2024, 12, 31), 1));
 
     return waitingJobQueue;
   }

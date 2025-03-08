@@ -3,6 +3,7 @@ package com.jameshskoh.handlers;
 import com.ib.client.Bar;
 import com.jameshskoh.client.DataJob;
 import com.jameshskoh.constants.ExchangeRateTicker;
+import com.jameshskoh.constants.IndexTicker;
 import com.jameshskoh.constants.StockTicker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,41 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
     DataJob job = getJobInfoCallback.apply(reqId);
 
     switch (job.ticker()) {
-      case StockTicker t -> handleStockHistoricalData(t, bar);
-      case ExchangeRateTicker t -> handleExchangeRateHistoricalData(t, bar);
+      case ExchangeRateTicker ticker -> handleExchangeRateHistoricalData(ticker, bar);
+      case IndexTicker ticker -> handleIndexHistoricalData(ticker, bar);
+      case StockTicker ticker -> handleStockHistoricalData(ticker, bar);
+    }
+  }
+
+  private void handleIndexHistoricalData(IndexTicker ticker, Bar bar) {
+
+    String insertSQL =
+        """
+INSERT INTO daily_index
+(symbol, exchange, currency, date, open, high, low, close)
+VALUES (?, ?, ?, ?, ? ,? ,? ,?)
+""";
+
+    try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+      System.out.println("Statement created!");
+
+      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+      LocalDate localDate = LocalDate.parse(bar.time(), dtf);
+
+      preparedStatement.setString(1, ticker.symbol());
+      preparedStatement.setString(2, ticker.exchange().getLabel());
+      preparedStatement.setString(3, ticker.currency().getLabel());
+      preparedStatement.setDate(4, java.sql.Date.valueOf(localDate));
+
+      preparedStatement.setBigDecimal(5, BigDecimal.valueOf(bar.open()));
+      preparedStatement.setBigDecimal(6, BigDecimal.valueOf(bar.high()));
+      preparedStatement.setBigDecimal(7, BigDecimal.valueOf(bar.low()));
+      preparedStatement.setBigDecimal(8, BigDecimal.valueOf(bar.close()));
+
+      preparedStatement.executeUpdate();
+      logger.info("Data inserted successfully!");
+    } catch (SQLException e) {
+      logger.error("Data insertion failed: {}", e.getMessage());
     }
   }
 
@@ -107,7 +141,6 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
       logger.info("Data inserted successfully!");
     } catch (SQLException e) {
       logger.error("Data insertion failed: {}", e.getMessage());
-
     }
   }
 

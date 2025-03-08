@@ -3,6 +3,7 @@ package com.jameshskoh.client;
 import com.ib.client.Contract;
 import com.ib.client.EClientSocket;
 import com.jameshskoh.constants.ExchangeRateTicker;
+import com.jameshskoh.constants.IndexTicker;
 import com.jameshskoh.constants.StockTicker;
 import com.jameshskoh.enums.*;
 
@@ -36,6 +37,29 @@ public class IbkrRequest {
         clientSocket, jobId, contract, endPeriod, TimeZones.UTC, backPeriodInYears, MIDPOINT);
   }
 
+  public void requestDailyHistoricalIndexPrice(
+      EClientSocket clientSocket,
+      int jobId,
+      IndexTicker ticker,
+      LocalDate endPeriod,
+      int backPeriodInYears) {
+
+    Contract contract = new Contract();
+    contract.symbol(ticker.symbol());
+    contract.secType(SecurityType.INDEX.getLabel());
+    contract.currency(ticker.currency().getLabel());
+    contract.exchange(ticker.exchange().getLabel());
+
+    requestDailyHistoricalData(
+        clientSocket,
+        jobId,
+        contract,
+        endPeriod,
+        ticker.exchange().getZoneId(),
+        backPeriodInYears,
+        TRADES);
+  }
+
   public void requestDailyHistoricalStockPrice(
       EClientSocket clientSocket,
       int jobId,
@@ -45,7 +69,7 @@ public class IbkrRequest {
 
     Contract contract = new Contract();
     contract.symbol(ticker.symbol());
-    contract.secType(ticker.securityType().getLabel());
+    contract.secType(SecurityType.STOCK_ETF.getLabel());
     contract.currency(ticker.currency().getLabel());
     contract.exchange(ticker.exchange().getLabel());
 

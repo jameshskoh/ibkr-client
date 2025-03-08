@@ -2,6 +2,7 @@ package com.jameshskoh.client;
 
 import com.ib.client.*;
 import com.jameshskoh.constants.ExchangeRateTicker;
+import com.jameshskoh.constants.IndexTicker;
 import com.jameshskoh.constants.StockTicker;
 import com.jameshskoh.handlers.DatabaseHistoricalDataHandler;
 import com.jameshskoh.handlers.HistoricalDataHandler;
@@ -52,6 +53,9 @@ public class IbkrClient {
 
     HistoricalDataHandler historicalDataHandler =
         new DatabaseHistoricalDataHandler(connection, getJobInfoCallback, removeJobCallback);
+
+    //    HistoricalDataHandler historicalDataHandler =
+    //        new LoggerHistoricalDataHandler(getJobInfoCallback, removeJobCallback);
 
     Runnable setConnectedCallback = () -> isConnected.set(true);
 
@@ -116,6 +120,9 @@ public class IbkrClient {
       case ExchangeRateTicker t ->
           ibkrRequest.requestDailyHistoricalExchangeRate(
               jobId, clientSocket, t, job.endPeriod(), job.backPeriodInYears());
+      case IndexTicker t ->
+          ibkrRequest.requestDailyHistoricalIndexPrice(
+              clientSocket, jobId, t, job.endPeriod(), job.backPeriodInYears());
       case StockTicker t ->
           ibkrRequest.requestDailyHistoricalStockPrice(
               clientSocket, jobId, t, job.endPeriod(), job.backPeriodInYears());
