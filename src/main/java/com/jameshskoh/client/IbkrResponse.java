@@ -5,12 +5,11 @@ import com.jameshskoh.handlers.HistoricalDataHandler;
 
 public class IbkrResponse extends AbstractIbkrResponse {
 
-  private final IbkrClient ibkrClient;
+  private final Runnable setConnectedCallback;
   private final HistoricalDataHandler historicalDataHandler;
 
-  public IbkrResponse(
-      IbkrClient ibkrClient, HistoricalDataHandler historicalDataHandler) {
-    this.ibkrClient = ibkrClient;
+  public IbkrResponse(Runnable setConnectedCallback, HistoricalDataHandler historicalDataHandler) {
+    this.setConnectedCallback = setConnectedCallback;
     this.historicalDataHandler = historicalDataHandler;
   }
 
@@ -27,7 +26,7 @@ public class IbkrResponse extends AbstractIbkrResponse {
   @Override
   public void nextValidId(int orderId) {
     System.out.println("Order ID received: " + orderId);
-    ibkrClient.setIsConnected();
+    setConnectedCallback.run();
   }
 
   @Override
@@ -56,6 +55,7 @@ public class IbkrResponse extends AbstractIbkrResponse {
 
   /**
    * Returns the requested historical data bars.
+   *
    * @param reqId
    * @param bar
    */
@@ -66,6 +66,7 @@ public class IbkrResponse extends AbstractIbkrResponse {
 
   /**
    * Marks the ending of the historical bars reception.
+   *
    * @param reqId
    * @param start
    * @param end

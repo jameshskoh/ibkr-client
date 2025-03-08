@@ -53,8 +53,10 @@ public class IbkrClient {
     HistoricalDataHandler historicalDataHandler =
         new DatabaseHistoricalDataHandler(connection, getJobInfoCallback, removeJobCallback);
 
+    Runnable setConnectedCallback = () -> isConnected.set(true);
+
     ibkrRequest = new IbkrRequest();
-    ibkrResponse = new IbkrResponse(this, historicalDataHandler);
+    ibkrResponse = new IbkrResponse(setConnectedCallback, historicalDataHandler);
     readerSignal = new EJavaSignal();
     clientSocket = new EClientSocket(ibkrResponse, readerSignal);
     readerExecutorService = Executors.newSingleThreadExecutor();
@@ -62,10 +64,6 @@ public class IbkrClient {
 
   public boolean isConnected() {
     return isConnected.get();
-  }
-
-  public void setIsConnected() {
-    isConnected.set(true);
   }
 
   public void connectAndListen(String host, int port, int clientId) {
