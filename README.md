@@ -7,7 +7,7 @@
 * [x] Change setIsConnected into a callback
 * [x] Create IndexTicker type, to support Index data type
 * [x] Replace all `System.out.println()` with loggers
-* [ ] Use upserts in place of inserts
+* [x] Use upserts in place of inserts
 * [ ] Implement insert batching handler impl.
 * [ ] Add Flyway support
 * [ ] Turn MIDPOINT/TRADES into enum

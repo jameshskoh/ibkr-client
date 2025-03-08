@@ -51,10 +51,12 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
 
     String insertSQL =
         """
-INSERT INTO daily_index
-(symbol, exchange, currency, date, open, high, low, close)
-VALUES (?, ?, ?, ?, ? ,? ,? ,?)
-""";
+        INSERT INTO daily_index
+        (symbol, exchange, currency, date, open, high, low, close)
+        VALUES (?, ?, ?, ?, ? ,? ,? ,?)
+        ON CONFLICT (symbol, exchange, currency, date)
+        DO UPDATE SET open = EXCLUDED.open, high = EXCLUDED.high, low = EXCLUDED.low, close = EXCLUDED.close
+        """;
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -81,10 +83,12 @@ VALUES (?, ?, ?, ?, ? ,? ,? ,?)
 
     String insertSQL =
         """
-    INSERT INTO daily_stock_price
-    (symbol, exchange, currency, date, open, high, low, close, wap, volume)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """;
+        INSERT INTO daily_stock_price
+        (symbol, exchange, currency, date, open, high, low, close, wap, volume)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (symbol, exchange, currency, date)
+        DO UPDATE SET open = EXCLUDED.open, high = EXCLUDED.high, low = EXCLUDED.low, close = EXCLUDED.close, wap = EXCLUDED.wap, volume = EXCLUDED.volume
+        """;
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -113,10 +117,12 @@ VALUES (?, ?, ?, ?, ? ,? ,? ,?)
 
     String insertSQL =
         """
-    INSERT INTO daily_exchange_rate
-    (base_currency, target_currency, date, open, high, low, close)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    """;
+        INSERT INTO daily_exchange_rate
+        (base_currency, target_currency, date, open, high, low, close)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (base_currency, target_currency, date)
+        DO UPDATE SET open = EXCLUDED.open, high = EXCLUDED.high, low = EXCLUDED.low, close = EXCLUDED.close
+        """;
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
