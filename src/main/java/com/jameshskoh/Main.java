@@ -39,16 +39,34 @@ public class Main {
   private static Queue<DataJob> prepareJobQueue() {
     Queue<DataJob> waitingJobQueue = new LinkedList<>();
 
-    //    waitingJobQueue.offer(new DataJob(StockTicker.A35, LocalDate.of(2024, 12, 31), 1));
-    //    waitingJobQueue.offer(new DataJob(StockTicker.HK2801, LocalDate.of(2024, 12, 31), 1));
-    waitingJobQueue.offer(new DataJob(StockTicker.G3B, LocalDate.of(2024, 12, 31), 1));
-    //    waitingJobQueue.offer(new DataJob(StockTicker.MBH, LocalDate.of(2024, 12, 31), 1));
-    //    waitingJobQueue.offer(new DataJob(StockTicker.SPLG, LocalDate.of(2024, 12, 31), 1));
-    //    waitingJobQueue.offer(new DataJob(StockTicker.STQ, LocalDate.of(2024, 12, 31), 1));
-    waitingJobQueue.offer(new DataJob(ExchangeRateTicker.USDSGD, LocalDate.of(2024, 12, 31), 1));
-    //    waitingJobQueue.offer(new DataJob(ExchangeRateTicker.EURSGD, LocalDate.of(2024, 12, 31),
-    // 1));
-    waitingJobQueue.offer(new DataJob(IndexTicker.SP500, LocalDate.of(2024, 12, 31), 1));
+    // Exchange rates
+
+    // USD.SGD good data starting from 1 Jan 2010
+    // waitingJobQueue.offer(new DataJob(ExchangeRateTicker.USDSGD, LocalDate.of(2025, 12, 31), 16));
+
+    // EUR.USD good data starting from 1 Jan 2006
+    // waitingJobQueue.offer(new DataJob(ExchangeRateTicker.EURUSD, LocalDate.of(2025, 12, 31), 20));
+
+    // USD.CNH good data starting from 1 Jan 2013
+    // waitingJobQueue.offer(new DataJob(ExchangeRateTicker.USDCNH, LocalDate.of(2025, 12, 31), 13));
+
+    // USD.JPY good data starting from 1 Jan 2006
+    // waitingJobQueue.offer(new DataJob(ExchangeRateTicker.USDJPY, LocalDate.of(2025, 12, 31), 20));
+
+     // EUR.SGD good data starting from 1 Jan 2010
+     // waitingJobQueue.offer(new DataJob(ExchangeRateTicker.EURSGD, LocalDate.of(2025, 12, 31), 16));
+
+    // SGD.CNH good data starting from 1 Jan 2013
+    // waitingJobQueue.offer(new DataJob(ExchangeRateTicker.SGDCNH, LocalDate.of(2025, 12, 31), 13));
+
+    // SGD.JPY good data starting from 1 Jan 2010
+    // waitingJobQueue.offer(new DataJob(ExchangeRateTicker.SGDJPY, LocalDate.of(2025, 12, 31), 16));
+
+    // Indexes
+    // waitingJobQueue.offer(new DataJob(IndexTicker.SP500, LocalDate.of(2025, 12, 31), 21));
+
+    // ETFs and stocks
+    // waitingJobQueue.offer(new DataJob(StockTicker.G3B, LocalDate.of(2024, 12, 31), 1));
 
     return waitingJobQueue;
   }

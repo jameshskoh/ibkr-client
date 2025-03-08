@@ -21,6 +21,8 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(DatabaseHistoricalDataHandler.class);
 
+  private static final String TWS = "TWS";
+
   private final Connection connection;
 
   private final IntFunction<DataJob> getJobInfoCallback;
@@ -52,8 +54,8 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
     String insertSQL =
         """
         INSERT INTO daily_index
-        (symbol, exchange, currency, date, open, high, low, close)
-        VALUES (?, ?, ?, ?, ? ,? ,? ,?)
+        (symbol, exchange, currency, date, open, high, low, close, source)
+        VALUES (?, ?, ?, ?, ? ,? ,? ,?, ?)
         ON CONFLICT (symbol, exchange, currency, date)
         DO UPDATE SET open = EXCLUDED.open, high = EXCLUDED.high, low = EXCLUDED.low, close = EXCLUDED.close
         """;
@@ -72,6 +74,8 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
       preparedStatement.setBigDecimal(7, BigDecimal.valueOf(bar.low()));
       preparedStatement.setBigDecimal(8, BigDecimal.valueOf(bar.close()));
 
+      preparedStatement.setString(9, TWS);
+
       preparedStatement.executeUpdate();
       logger.info("Index data inserted successfully!");
     } catch (SQLException e) {
@@ -84,8 +88,8 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
     String insertSQL =
         """
         INSERT INTO daily_stock_price
-        (symbol, exchange, currency, date, open, high, low, close, wap, volume)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (symbol, exchange, currency, date, open, high, low, close, wap, volume, source)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (symbol, exchange, currency, date)
         DO UPDATE SET open = EXCLUDED.open, high = EXCLUDED.high, low = EXCLUDED.low, close = EXCLUDED.close, wap = EXCLUDED.wap, volume = EXCLUDED.volume
         """;
@@ -106,6 +110,8 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
       preparedStatement.setBigDecimal(9, bar.wap().value());
       preparedStatement.setBigDecimal(10, bar.volume().value());
 
+      preparedStatement.setString(11, TWS);
+
       preparedStatement.executeUpdate();
       logger.info("Stock data inserted successfully!");
     } catch (SQLException e) {
@@ -118,8 +124,8 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
     String insertSQL =
         """
         INSERT INTO daily_exchange_rate
-        (base_currency, target_currency, date, open, high, low, close)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (base_currency, target_currency, date, open, high, low, close, source)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (base_currency, target_currency, date)
         DO UPDATE SET open = EXCLUDED.open, high = EXCLUDED.high, low = EXCLUDED.low, close = EXCLUDED.close
         """;
@@ -136,6 +142,8 @@ public class DatabaseHistoricalDataHandler implements HistoricalDataHandler {
       preparedStatement.setBigDecimal(5, BigDecimal.valueOf(bar.high()));
       preparedStatement.setBigDecimal(6, BigDecimal.valueOf(bar.low()));
       preparedStatement.setBigDecimal(7, BigDecimal.valueOf(bar.close()));
+
+      preparedStatement.setString(8, TWS);
 
       preparedStatement.executeUpdate();
       logger.info("Exchange rate data inserted successfully!");
