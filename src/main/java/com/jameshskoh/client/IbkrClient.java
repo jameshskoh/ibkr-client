@@ -6,6 +6,9 @@ import com.jameshskoh.constants.IndexTicker;
 import com.jameshskoh.constants.StockTicker;
 import com.jameshskoh.handlers.DatabaseHistoricalDataHandler;
 import com.jameshskoh.handlers.HistoricalDataHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -19,6 +22,8 @@ import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 
 public class IbkrClient {
+
+  private static final Logger logger = LoggerFactory.getLogger(IbkrClient.class);
 
   // connection related
   private final AtomicBoolean isConnected = new AtomicBoolean(false);
@@ -84,7 +89,7 @@ public class IbkrClient {
             try {
               reader.processMsgs();
             } catch (Exception e) {
-              System.out.println("Exception: " + e.getMessage());
+              logger.error("Reader thread failed with exception:", e);
             }
           }
         });

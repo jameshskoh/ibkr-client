@@ -2,10 +2,15 @@ package com.jameshskoh.handlers;
 
 import com.ib.client.Bar;
 import com.jameshskoh.client.DataJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 
 public class LoggerHistoricalDataHandler implements HistoricalDataHandler {
+
+  private static final Logger logger = LoggerFactory.getLogger(LoggerHistoricalDataHandler.class);
 
   private final IntFunction<DataJob> getJobInfoCallback;
   private final IntConsumer removeJobCallback;
@@ -22,14 +27,11 @@ public class LoggerHistoricalDataHandler implements HistoricalDataHandler {
 
     DataJob job = getJobInfoCallback.apply(reqId);
 
-    String historicalDataTemplate =
+    logger.info(
         """
-        Historical data of %s:
-        %s - Open: %s, High: %s, Low: %s, Close: %s, Weighted average price: %s, Volume: %s
-        """;
-
-    System.out.printf(
-        historicalDataTemplate,
+        Historical data of {}:
+          {} - Open: {}, High: {}, Low: {}, Close: {}, Weighted average price: {}, Volume: {}
+        """,
         job.ticker(),
         bar.time(),
         bar.open(),
@@ -42,7 +44,7 @@ public class LoggerHistoricalDataHandler implements HistoricalDataHandler {
 
   @Override
   public void handleHistoricalDataEnd(int reqId, String start, String end) {
-    System.out.println("Historical Data End: " + start + ", " + end);
+    logger.info("Historical data transmission complete: {} - {}", start, end);
     removeJobCallback.accept(reqId);
   }
 }

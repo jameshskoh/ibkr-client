@@ -2,8 +2,12 @@ package com.jameshskoh.client;
 
 import com.ib.client.*;
 import com.jameshskoh.handlers.HistoricalDataHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IbkrResponse extends AbstractIbkrResponse {
+
+  private static final Logger logger = LoggerFactory.getLogger(IbkrResponse.class);
 
   private final Runnable setConnectedCallback;
   private final HistoricalDataHandler historicalDataHandler;
@@ -15,42 +19,49 @@ public class IbkrResponse extends AbstractIbkrResponse {
 
   @Override
   public void connectAck() {
-    System.out.println("Connection is acknowledged!");
+    logger.info("TWS connection is acknowledged!");
   }
 
   @Override
   public void connectionClosed() {
-    System.out.println("Connection is closed!");
+    logger.info("TWS connection closed successfully!");
   }
 
   @Override
   public void nextValidId(int orderId) {
-    System.out.println("Order ID received: " + orderId);
+    logger.info("Order ID received: {}", orderId);
     setConnectedCallback.run();
   }
 
   @Override
   public void managedAccounts(String s) {
-    System.out.println("Managed Accounts: " + s);
+    logger.info("Managed account: {}", s);
   }
 
   @Override
   public void userInfo(int i, String s) {
-    System.out.println("User Info: " + s);
+    logger.info("User info: {}", s);
   }
 
   @Override
   public void error(int id, int errorCode, String errorMessage, String advancedOrderRejectJson) {
-    String messageTemplate =
-        """
-            ID: %d
-            Error Code: %d
-            Error Message: %s
-            Advanced Order Reject JSON:
-            %s
-            """;
-
-    System.out.printf(messageTemplate, id, errorCode, errorMessage, advancedOrderRejectJson);
+    if (id == -1) {
+      logger.info("Keep alive: connection alive.");
+    } else {
+      logger.error(
+          """
+          TWS error:
+            ID: {}
+            Error code: {}
+            Error message: {}
+            Advanced order reject JSON:
+          {}
+          """,
+          id,
+          errorCode,
+          errorMessage,
+          advancedOrderRejectJson);
+    }
   }
 
   /**

@@ -57,8 +57,6 @@ VALUES (?, ?, ?, ?, ? ,? ,? ,?)
 """;
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-      System.out.println("Statement created!");
-
       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
       LocalDate localDate = LocalDate.parse(bar.time(), dtf);
 
@@ -73,9 +71,9 @@ VALUES (?, ?, ?, ?, ? ,? ,? ,?)
       preparedStatement.setBigDecimal(8, BigDecimal.valueOf(bar.close()));
 
       preparedStatement.executeUpdate();
-      logger.info("Data inserted successfully!");
+      logger.info("Index data inserted successfully!");
     } catch (SQLException e) {
-      logger.error("Data insertion failed: {}", e.getMessage());
+      logger.error("Index data insertion failed", e);
     }
   }
 
@@ -89,8 +87,6 @@ VALUES (?, ?, ?, ?, ? ,? ,? ,?)
     """;
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-      System.out.println("Statement created!");
-
       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
       LocalDate localDate = LocalDate.parse(bar.time(), dtf);
 
@@ -107,9 +103,9 @@ VALUES (?, ?, ?, ?, ? ,? ,? ,?)
       preparedStatement.setBigDecimal(10, bar.volume().value());
 
       preparedStatement.executeUpdate();
-      logger.info("Data inserted successfully!");
+      logger.info("Stock data inserted successfully!");
     } catch (SQLException e) {
-      logger.error("Data insertion failed: {}", e.getMessage());
+      logger.error("Stock data insertion failed", e);
     }
   }
 
@@ -123,8 +119,6 @@ VALUES (?, ?, ?, ?, ? ,? ,? ,?)
     """;
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-      System.out.println("Statement created!");
-
       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
       LocalDate localDate = LocalDate.parse(bar.time(), dtf);
 
@@ -138,15 +132,15 @@ VALUES (?, ?, ?, ?, ? ,? ,? ,?)
       preparedStatement.setBigDecimal(7, BigDecimal.valueOf(bar.close()));
 
       preparedStatement.executeUpdate();
-      logger.info("Data inserted successfully!");
+      logger.info("Exchange rate data inserted successfully!");
     } catch (SQLException e) {
-      logger.error("Data insertion failed: {}", e.getMessage());
+      logger.error("Exchange rate data insertion failed", e);
     }
   }
 
   @Override
   public void handleHistoricalDataEnd(int reqId, String start, String end) {
-    System.out.println("Historical Data End: " + start + ", " + end);
+    logger.info("Historical data transmission complete: {} - {}", start, end);
     removeJobCallback.accept(reqId);
   }
 }
