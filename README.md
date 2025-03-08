@@ -4,7 +4,7 @@
 
 * [x] Parameterize private repo in pom.xml
 * [x] Parameterize projectId in SecretClient as program argument
-* [ ] Change setIsConnected into a callback
+* [x] Change setIsConnected into a callback
 * [ ] Create IndexTicker type, to support Index data type
 * [ ] Implement insert batching handler impl.
 * [ ] Use upserts in place of inserts
