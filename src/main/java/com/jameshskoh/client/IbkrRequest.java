@@ -16,9 +16,6 @@ import java.time.format.DateTimeFormatter;
 // https://www.interactivebrokers.com/campus/ibkr-quant-news/retrieving-historical-data-from-ibkr/
 public class IbkrRequest {
 
-  private static final String MIDPOINT = "MIDPOINT";
-  private static final String TRADES = "TRADES";
-
   public void requestDailyHistoricalExchangeRate(
       int jobId,
       EClientSocket clientSocket,
@@ -34,7 +31,13 @@ public class IbkrRequest {
 
     // exchange rate data does not have TRADES data, nor volume, nor volume weighted average
     requestDailyHistoricalData(
-        clientSocket, jobId, contract, endPeriod, TimeZones.UTC, backPeriodInYears, MIDPOINT);
+        clientSocket,
+        jobId,
+        contract,
+        endPeriod,
+        TimeZones.UTC,
+        backPeriodInYears,
+        TradeDataType.MIDPOINT.getLabel());
   }
 
   public void requestDailyHistoricalIndexPrice(
@@ -57,7 +60,7 @@ public class IbkrRequest {
         endPeriod,
         ticker.exchange().getZoneId(),
         backPeriodInYears,
-        TRADES);
+        TradeDataType.TRADES.getLabel());
   }
 
   public void requestDailyHistoricalStockPrice(
@@ -80,7 +83,7 @@ public class IbkrRequest {
         endPeriod,
         ticker.exchange().getZoneId(),
         backPeriodInYears,
-        TRADES);
+        TradeDataType.TRADES.getLabel());
   }
 
   private void requestDailyHistoricalData(
